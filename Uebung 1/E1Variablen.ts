@@ -1,10 +1,12 @@
-//It works
 let wertAusLibrary: any = 5;
 wertAusLibrary += 1;
 console.log(wertAusLibrary);
 
-// Doesn't work...
-// <number>wertAusLibrary += 1;
+let number2: number = <number><any>wertAusLibrary;
+console.log(++number2);
+
+wertAusLibrary = <number>wertAusLibrary;
+wertAusLibrary += 1;
 console.log(wertAusLibrary);
 
 var str = '1';
