@@ -27,3 +27,21 @@ function power(base: number, exponent: number): number {
         : exponent < 0 ? 1 / power(base, -exponent)
             : power(base, exponent - 1) * base;
 }
+
+const potentiate = (base: number, exponent: number) => base ** exponent;
+const boredom = (...ignored: any[]) => "Boredom";
+console.log(typeof boredom);
+
+// Optional Parameters
+// No 2nd function with the same name
+
+
+const arbitraryArguments = (array: number[],
+    callback: (a: number, b: number) =>
+        number) => {
+    let result = 0;
+    for (let i = 0; i < array.length; i++) {
+        result = callback(result, array[i]);
+    }
+    return result;
+};
