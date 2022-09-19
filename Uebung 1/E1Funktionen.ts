@@ -1,6 +1,6 @@
 pyramid(5, "-");
 pyramid(5);
-console.log(power(5, 4));
+console.log(power(5, 2));
 
 const multiply = (...numbers: number[]) => numbers.reduce((a, b) => a * b);
 let product = multiply;
@@ -19,13 +19,11 @@ function division(...numbers: number[]) {
     if (numbers.length > 2) {
         return numbers.shift() ?? 1 / multiply(...numbers);
     }
-    return Math.min;
+    throw 'At least 2 parameters should be supplied';
 }
 
 function power(base: number, exponent: number): number {
-    if (exponent != 1) {
-        return power(base, exponent - 1) * base;
-    } else {
-        return base;
-    }
+    return exponent == 0 ? 1
+        : exponent < 0 ? 1 / power(base, -exponent)
+            : power(base, exponent - 1) * base;
 }
