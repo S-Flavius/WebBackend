@@ -22,17 +22,10 @@ let me = {
 // hans = me; workz
 
 // 1.4
-console.log(<any>me.id);
+console.log((<typeof me>me).id);
 
 // 1.5
-type Worker = {
-    firstname: string;
-    lastname: string;
-    age?: number;
-    id: string;
-    salary: number;
-    department: string;
-};
+type Worker = Person & { id, salary, department; };
 
 let worker: Worker = {
     firstname: "Rando",
