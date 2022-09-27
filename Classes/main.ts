@@ -1,10 +1,7 @@
 import { GradeClass } from './Classroom';
-import { StudentClass as StudentClass } from './Student';
+import { StudentClass } from './Student';
 
 let mark: StudentClass = new StudentClass("Mark", "Zuckerberg", new Date("1984-05-14"));
-console.log(mark.toString());
-
-
 
 let b11b: GradeClass = new GradeClass("b11b");
 
