@@ -24,4 +24,12 @@ export class GradeClass implements Grade {
         this.description = description;
         this.students = [];
     }
+
+    toString() {
+        return `Grade {
+            ${this.description},
+            {${this.students}
+        }`;
+    }
+
 }

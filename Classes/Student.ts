@@ -1,6 +1,6 @@
 import { GradeClass } from "./Classroom";
 
-interface Student {
+export interface Student {
     firstName: String;
     lastName: String;
     birthDate: Date;
@@ -14,7 +14,13 @@ export class StudentClass implements Student {
     birthDate: Date;
 
     username: String;
-    grade: GradeClass = new GradeClass("");
+    private _grade: GradeClass = new GradeClass("");
+    public get grade(): GradeClass {
+        return this._grade;
+    }
+    public set grade(value: GradeClass) {
+        this._grade = value === null ? this.grade : value;
+    }
     static numberInstances: number = 0;
 
 
@@ -34,7 +40,7 @@ export class StudentClass implements Student {
     }
 
     leave() {
-        this.grade.leave(this);
+        this._grade.leave(this);
     }
 
 
@@ -44,7 +50,7 @@ export class StudentClass implements Student {
             ${this.lastName},
             ${this.birthDate},
             ${this.username},
-            ${this.grade}
+            ${this._grade}
         }`;
     }
 
