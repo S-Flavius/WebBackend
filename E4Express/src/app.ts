@@ -1,10 +1,12 @@
 import express, { query } from "express";
-import { Todo } from "./todo";
+import { Todo } from "./Todo";
 const app = express();
 const port = 3000;
 
 let items: Todo[] = [];
 
+
+app.use(express.json());
 
 app.listen(port, () => {
     console.log(`I'm works http://localhost:${port}`);
@@ -15,30 +17,46 @@ app.get("/", (req, res) => {
 });
 
 app.get("/items", (req, res) => {
-    // db.query('Select * from todo where done = false');
-    if (req.query) {
-        req.query["done"] === "true";
+    if (req.query["showDone"] === "true") {
         res.send(items);
+    } else {
+        res.status(200).send(items.filter(i => !i.isDone));
     }
-
-    res.send(JSON.stringify(items.filter(i => !i.done)));
 });
 
 app.post("/item", (req, res) => {
-    let item = JSON.parse(req.body);
+    let item: Todo = req.body;
 
     items.push(item);
-    console.log(item);
-    console.log(items);
     res.send("Item added");
 });
 
 app.post("/items", (req, res) => {
-    items.push(req.body);
-    res.send("items added");
+
+    for (const item of req.body) {
+        if (!isTodo(item))
+            res.status(400).send("Invalid item");
+    }
+
+    for (const item of req.body) {
+        console.log(item.type);
+        items.push(item);
+    }
+
+
+    res.status(200).send("Items added");
+});
+
+app.post("/items/bulkupload", (req, res) => {
+
 });
 
 app.delete("/item/:description", (req, res) => {
-    items.filter(i => i.description !== req.params.description);
+    items = items.filter(i => i.description !== req.params.description);
     res.send("item deleted");
 });
+
+function isTodo(item: any): item is Todo {
+    return item.description !== undefined
+        && item.done !== undefined;
+}
