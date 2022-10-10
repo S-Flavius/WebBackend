@@ -25,9 +25,10 @@ const app = express();
 
 app.use((req, res, next) => {
 
-    if (req.url !== "/bulkupload")
+    if (req.originalUrl == "/bulkupload")
+        express.text()(req, res, next);
+    else
         express.json()(req, res, next);
-    express.text()(req, res, next);
 });
 
 app.listen(3000, () => {
@@ -47,6 +48,29 @@ app.post("/item", (req, res) => {
 });
 
 app.post("/items", addTasks);
+
+app.post("/bulkupload", (req, res) => {
+    let request: String = req.body;
+
+    let items: String[] = request.split("\n");
+
+    items.forEach(item => {
+        let task;
+        let splitItem = item.split(";");
+        if (splitItem.length === 1)
+            task = new Task(splitItem[0]);
+        else if (splitItem.length === 2)
+            task = new Task(splitItem[0], new Date(splitItem[1]));
+        else if (splitItem.length === 3)
+            task = new Task(splitItem[0], new Date(splitItem[1]), splitItem[2] == "open" ? false : true);
+        else
+            throw "Invalid format";
+        taskList.push(task);
+    });
+
+    console.log(req.body);
+    res.send();
+});
 
 function addTasks(req: Request, res: Response) {
     // Check Format and create objects
@@ -82,6 +106,6 @@ app.delete("/item/:title", (req, res) => {
         res.send("Task deleted!");
 });
 
-// import {v4 as guid } from "uuid";
+import { v4 as guid } from "uuid";
 
-// console.log(guid());
+console.log(guid());

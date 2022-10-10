@@ -13,5 +13,8 @@
   },
   "author": "S-Flavius",
   "license": "MIT",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@types/uuid": "^8.3.4"
+  }
 }
