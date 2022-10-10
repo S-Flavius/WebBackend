@@ -23,6 +23,7 @@ taskList[1].isDone = true;
 
 const app = express();
 
+
 app.use((req, res, next) => {
 
     if (req.originalUrl == "/bulkupload")
@@ -86,7 +87,7 @@ function addTasks(req: Request, res: Response) {
     // Check for existing tasks
     for (const newTask of newTasks) {
         for (let existingTask of taskList) {
-            if (existingTask.title == newTask.title) {
+            if (existingTask.uuid == newTask.uuid) {
                 res.status(400).send("Already there");
                 return;
             }
@@ -97,7 +98,7 @@ function addTasks(req: Request, res: Response) {
     res.sendStatus(200);
 }
 
-app.delete("/item/:title", (req, res) => {
+app.delete("/item/title/:title", (req, res) => {
     let oldLen = taskList.length;
     taskList = taskList.filter(e => e.title != req.params.title);
     if (oldLen == taskList.length)
@@ -105,7 +106,11 @@ app.delete("/item/:title", (req, res) => {
     else
         res.send("Task deleted!");
 });
-
-import { v4 as guid } from "uuid";
-
-console.log(guid());
+app.delete("/item/:uuid", (req, res) => {
+    let oldLen = taskList.length;
+    taskList = taskList.filter(e => e.uuid != req.params.uuid);
+    if (oldLen == taskList.length)
+        res.status(400).send("Could not delete");
+    else
+        res.send("Task deleted!");
+});
