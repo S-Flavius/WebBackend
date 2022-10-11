@@ -11,15 +11,15 @@ import express, { Request, Response } from "express";
 import { Task } from "./Task";
 
 
-let taskList: Task[] = [];
+let taskMap = new Map<String, Task>();
 
 // Beispieldaten
-taskList.push(new Task("Kehren"));
-taskList.push(new Task("Lernen", new Date("2022-09-26T07:58:30")));
-taskList[1].isDone = true;
-
-
-
+let tempTask = new Task("Kehren");
+taskMap.set(tempTask.uuid, tempTask);
+tempTask = new Task("Putzen");
+taskMap.set(tempTask.uuid, tempTask);
+tempTask = new Task("Backen");
+taskMap.set(tempTask.uuid, tempTask);
 
 const app = express();
 
@@ -38,9 +38,9 @@ app.listen(3000, () => {
 
 app.get("/items", (req, res) => {
     if (req.query.showDone == "true")
-        res.json(taskList);
+        res.json(taskMap.values());
     else
-        res.send(taskList.filter(item => !item.isDone));
+        res.send(Array.from(taskMap.values()).filter(item => !item.isDone));
 });
 
 app.post("/item", (req, res) => {
@@ -55,18 +55,34 @@ app.post("/bulkupload", (req, res) => {
 
     let items: String[] = request.split("\n");
 
+    //Check for header
+    let titlePos = 0, datePos = 1, donePos = 2;
+    let splitFirstLine = items[0].split(";");
+    if (items[0].includes("title"))
+        titlePos = splitFirstLine.indexOf("title");
+    if (items[0].includes("date"))
+        datePos = splitFirstLine.indexOf("date");
+    if (items[0].includes("done"))
+        datePos = splitFirstLine.indexOf("done");
+
+
     items.forEach(item => {
-        let task;
+        let task: Task;
         let splitItem = item.split(";");
-        if (splitItem.length === 1)
-            task = new Task(splitItem[0]);
-        else if (splitItem.length === 2)
-            task = new Task(splitItem[0], new Date(splitItem[1]));
-        else if (splitItem.length === 3)
-            task = new Task(splitItem[0], new Date(splitItem[1]), splitItem[2] == "open" ? false : true);
+
+
+        if (splitItem.length === 1 && titlePos === 1)
+            task = new Task(splitItem[titlePos]);
+        else if (splitItem.length === 2 && titlePos <= 2) {
+            task = new Task(splitItem[titlePos], new Date(splitItem[datePos]));
+        }
+        else if (splitItem.length === 3 && titlePos <= 3)
+            task = new Task(splitItem[titlePos],
+                new Date(splitItem[datePos]) || undefined,
+                splitItem[donePos] != "open");
         else
             throw "Invalid format";
-        taskList.push(task);
+        taskMap.set(task.uuid, task);
     });
 
     console.log(req.body);
@@ -86,30 +102,32 @@ function addTasks(req: Request, res: Response) {
 
     // Check for existing tasks
     for (const newTask of newTasks) {
-        for (let existingTask of taskList) {
+        for (let existingTask of taskMap.values()) {
             if (existingTask.uuid == newTask.uuid) {
                 res.status(400).send("Already there");
                 return;
             }
         }
+        taskMap.set(newTask.uuid, newTask);
     };
 
-    taskList = taskList.concat(newTasks);
     res.sendStatus(200);
 }
 
-app.delete("/item/title/:title", (req, res) => {
-    let oldLen = taskList.length;
-    taskList = taskList.filter(e => e.title != req.params.title);
-    if (oldLen == taskList.length)
-        res.status(400).send("Could not delete");
-    else
-        res.send("Task deleted!");
-});
+// app.delete("/item/title/:title", (req, res) => {
+//     let oldLen = taskMap.size;
+//     taskMap.delete(req.params.title);
+//     if (oldLen == taskMap.size)
+//         res.status(400).send("Could not delete");
+//     else {
+//         res.send("Task deleted!");
+//     }
+// });
+
 app.delete("/item/:uuid", (req, res) => {
-    let oldLen = taskList.length;
-    taskList = taskList.filter(e => e.uuid != req.params.uuid);
-    if (oldLen == taskList.length)
+    let oldLen = taskMap.size;
+    taskMap.delete(req.params.uuid);
+    if (oldLen == taskMap.size)
         res.status(400).send("Could not delete");
     else
         res.send("Task deleted!");
