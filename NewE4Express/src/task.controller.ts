@@ -20,59 +20,50 @@ export function addTask(req: Request, res: Response) {
 }
 
 export function addTasks(req: Request, res: Response) {
-    var newTasks = req.body.map((i: any) => new Task(i.title, i.dueDate, i.isDone == true));
+    var newTasks: Task[] = req.body;
 
-    // Check for existing tasks
-    for (const newTask of newTasks) {
-        for (let existingTask of taskMap.values())
-            if (existingTask.uuid == newTask.uuid) {
-                res.status(400).send("Already there");
-                return;
-            }
-
-        taskMap.set(newTask.uuid, newTask);
-    };
+    newTasks.forEach(t => taskMap.set(t.uuid, t));
 
     res.sendStatus(200);
 }
 
-export function bulkUpload(req: Request, res: Response) {
-    let request: String = req.body;
+// export function bulkUpload(req: Request, res: Response) {
+//     let request: String = req.body;
 
-    let items: String[] = request.split("\n");
+//     let items: String[] = request.split("\n");
 
-    //Check for header
-    let titlePos = 0, datePos = 1, donePos = 2;
-    let splitFirstLine = items[0].split(";");
-    if (items[0].includes("title"))
-        titlePos = splitFirstLine.indexOf("title");
-    if (items[0].includes("date"))
-        datePos = splitFirstLine.indexOf("date");
-    if (items[0].includes("done"))
-        datePos = splitFirstLine.indexOf("done");
+//     //Check for header
+//     let titlePos = 0, datePos = 1, donePos = 2;
+//     let splitFirstLine = items[0].split(";");
+//     if (items[0].includes("title"))
+//         titlePos = splitFirstLine.indexOf("title");
+//     if (items[0].includes("date"))
+//         datePos = splitFirstLine.indexOf("date");
+//     if (items[0].includes("done"))
+//         datePos = splitFirstLine.indexOf("done");
 
 
-    items.forEach(item => {
-        let task: Task;
-        let splitItem = item.split(";");
+//     items.forEach(item => {
+//         let task: Task;
+//         let splitItem = item.split(";");
 
-        if (splitItem.length === 1 && titlePos === 1)
-            task = new Task(splitItem[titlePos]);
-        else if (splitItem.length === 2 && titlePos <= 2) {
-            task = new Task(splitItem[titlePos], new Date(splitItem[datePos]));
-        }
-        else if (splitItem.length === 3 && titlePos <= 3) {
-            task = new Task(splitItem[titlePos],
-                new Date(splitItem[datePos]) || undefined,
-                splitItem[donePos] != "open");
-        } else
-            throw "Invalid format";
-        taskMap.set(task.uuid, task);
-    });
-
-    console.log(req.body);
-    res.send();
-}
+//         if (splitItem.length === 1 && titlePos === 1)
+//             task = new Task(splitItem[titlePos]);
+//         else if (splitItem.length === 2 && titlePos <= 2) {
+//             task = new Task(splitItem[titlePos], new Date(splitItem[datePos]));
+//         }
+//         else if (splitItem.length === 3 && titlePos <= 3) {
+//             task = new Task(splitItem[titlePos],
+//                 new Date(splitItem[datePos]) || undefined,
+//                 splitItem[donePos] != "open");
+//         } else
+//             throw "Invalid format";
+//         taskMap.set(task.uuid, task);
+//     });
+//
+//     console.log(req.body);
+//     res.send();
+// }
 
 
 export function getItems(req: Request, res: Response) {

@@ -1,10 +1,12 @@
 import express, { NextFunction, Request, Response } from "express";
-import { Schema, ZodError } from 'Zod';
+import { Schema } from 'Zod';
 import { taskSchema, tasksSchema } from "./schemes";
 import {
-    addTasks, bulkUpload, deleteByUUID,
+    addTasks, //bulkUpload,
+    deleteByUUID,
     getItems, addTask as addTask
 } from "./task.controller";
+import { login, signUp } from "./user.controller";
 
 const app = express();
 
@@ -18,7 +20,7 @@ app.use((req, res, next) => {
 
 const validateMiddlewareFactory = (schema: Schema) => ((req: Request, res: Response, next: NextFunction) => {
     try {
-        schema.parse(req.body);
+        req.body = schema.parse({ body: req.body, params: req.params, query: req.query }).body;
     } catch (e) {
         res.status(400).send(e);
         next();
@@ -26,7 +28,6 @@ const validateMiddlewareFactory = (schema: Schema) => ((req: Request, res: Respo
     res.status(200).send('item inserted');
     next();
 });
-
 
 
 app.listen(3000, () => {
@@ -39,6 +40,10 @@ app.post("/api/task", validateMiddlewareFactory(taskSchema), addTask);
 
 app.post("/api/tasks", validateMiddlewareFactory(tasksSchema), addTasks);
 
-app.post("/api/bulkupload", bulkUpload);
+// app.post("/api/bulkupload", bulkUpload);
 
 app.delete("/api/task/:uuid", deleteByUUID);
+
+app.post("/api/signup", signUp);
+
+app.get("/api/login", login);
