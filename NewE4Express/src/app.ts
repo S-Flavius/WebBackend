@@ -1,16 +1,9 @@
-/**
- * Musterlösung Aufgabe Todo-API Version 1
- * - Verwendung von class hat keinen Mehrwert (bis jetzt)
- * - toJSON brauchen wir wg. getter/setter
- * - rudimentäre Prüfungen der Form vorhanden (Es kann (absichtlich) immer noch Quatsch in die taskList geschrieben werden)
- * - Vermeidung von doppeltem Code
- * - Das Datum ist relativ aufwändig.
- */
-
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
+import { Schema, ZodError } from 'Zod';
+import { taskSchema, tasksSchema } from "./schemes";
 import {
     addTasks, bulkUpload, deleteByUUID,
-    getItems, postItems
+    getItems, addTask as addTask
 } from "./task.controller";
 
 const app = express();
@@ -22,16 +15,30 @@ app.use((req, res, next) => {
         express.json()(req, res, next);
 });
 
+
+const validateMiddlewareFactory = (schema: Schema) => ((req: Request, res: Response, next: NextFunction) => {
+    try {
+        schema.parse(req.body);
+    } catch (e) {
+        res.status(400).send(e);
+        next();
+    }
+    res.status(200).send('item inserted');
+    next();
+});
+
+
+
 app.listen(3000, () => {
     console.log("Express is running on http://localhost:3000");
 });
 
-app.get("api/tasks", getItems);
+app.get("/api/tasks", getItems);
 
-app.post("api/task", postItems);
+app.post("/api/task", validateMiddlewareFactory(taskSchema), addTask);
 
-app.post("api/tasks", addTasks);
+app.post("/api/tasks", validateMiddlewareFactory(tasksSchema), addTasks);
 
-app.post("api/bulkupload", bulkUpload);
+app.post("/api/bulkupload", bulkUpload);
 
-app.delete("api/task/:uuid", deleteByUUID);
+app.delete("/api/task/:uuid", deleteByUUID);

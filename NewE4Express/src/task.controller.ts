@@ -3,7 +3,7 @@ import { Task } from "./Task";
 import { taskMap } from "./TaskStore";
 
 
-export function deleteByUUID(req, res) {
+export function deleteByUUID(req: Request, res: Response) {
     let oldLen = taskMap.size;
     taskMap.delete(req.params.uuid);
     if (oldLen == taskMap.size)
@@ -13,25 +13,23 @@ export function deleteByUUID(req, res) {
         res.send("Task deleted!");
 }
 
+
+export function addTask(req: Request, res: Response) {
+    req.body = [req.body];
+    addTasks(req, res);
+}
+
 export function addTasks(req: Request, res: Response) {
-    // Check Format and create objects
-    try {
-        if (!Array.isArray(req.body))
-            throw "Is not an Array";
-        var newTasks = req.body.map(Task.fromJSON);
-    } catch (e) {
-        res.status(400).send(e);
-        return;
-    }
+    var newTasks = req.body.map((i: any) => new Task(i.title, i.dueDate, i.isDone == true));
 
     // Check for existing tasks
     for (const newTask of newTasks) {
-        for (let existingTask of taskMap.values()) {
+        for (let existingTask of taskMap.values())
             if (existingTask.uuid == newTask.uuid) {
                 res.status(400).send("Already there");
                 return;
             }
-        }
+
         taskMap.set(newTask.uuid, newTask);
     };
 
@@ -58,18 +56,16 @@ export function bulkUpload(req: Request, res: Response) {
         let task: Task;
         let splitItem = item.split(";");
 
-
         if (splitItem.length === 1 && titlePos === 1)
             task = new Task(splitItem[titlePos]);
         else if (splitItem.length === 2 && titlePos <= 2) {
             task = new Task(splitItem[titlePos], new Date(splitItem[datePos]));
         }
-        else if (splitItem.length === 3 && titlePos <= 3)
+        else if (splitItem.length === 3 && titlePos <= 3) {
             task = new Task(splitItem[titlePos],
                 new Date(splitItem[datePos]) || undefined,
                 splitItem[donePos] != "open");
-
-        else
+        } else
             throw "Invalid format";
         taskMap.set(task.uuid, task);
     });
@@ -78,10 +74,6 @@ export function bulkUpload(req: Request, res: Response) {
     res.send();
 }
 
-export function postItems(req: Request, res: Response) {
-    req.body = [req.body];
-    addTasks(req, res);
-}
 
 export function getItems(req: Request, res: Response) {
     if (req.query.showDone == "true")
