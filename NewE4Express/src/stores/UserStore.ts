@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 
 
-export let userMap = new Map<String, String>();
+export let userMap = new Map<string, string>();
 
 
 // Beispieldaten

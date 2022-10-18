@@ -1,5 +1,5 @@
 import { z } from 'Zod';
-import { Task } from './Task';
+import { Task } from '../classes/Task';
 
 const task = z.object({
     title: z.string().min(1),

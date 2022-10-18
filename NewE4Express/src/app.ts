@@ -1,12 +1,13 @@
 import express, { NextFunction, Request, Response } from "express";
 import { Schema } from 'Zod';
-import { taskSchema, tasksSchema } from "./schemes";
+import { taskSchema, tasksSchema } from "./schemes/taskSchemes";
 import {
     addTasks, //bulkUpload,
     deleteByUUID,
     getItems, addTask as addTask
-} from "./task.controller";
-import { login, signUp } from "./user.controller";
+} from './controllers/task.controller';
+import { login, signUp } from "./controllers/user.controller";
+import { userSchema } from "./schemes/userSchemes";
 
 const app = express();
 
@@ -44,6 +45,9 @@ app.post("/api/tasks", validateMiddlewareFactory(tasksSchema), addTasks);
 
 app.delete("/api/task/:uuid", deleteByUUID);
 
-app.post("/api/signup", signUp);
 
-app.get("/api/login", login);
+app.post("/api/user", signUp);
+
+app.get("/api/user/login", login);
+
+app.delete("/api/user/login", () => { return; });

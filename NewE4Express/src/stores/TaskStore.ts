@@ -1,4 +1,4 @@
-import { Task } from "./Task";
+import { Task } from "../classes/Task";
 
 
 export let taskMap = new Map<String, Task>();

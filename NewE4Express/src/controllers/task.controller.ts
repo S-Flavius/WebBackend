@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { Task } from "./Task";
-import { taskMap } from "./TaskStore";
+import { Task } from "../classes/Task";
+import { taskMap } from "../stores/TaskStore";
 
 
 export function deleteByUUID(req: Request, res: Response) {
