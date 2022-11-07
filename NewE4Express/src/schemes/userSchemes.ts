@@ -1,14 +1,29 @@
-import { z } from 'Zod';
-import { User } from '../classes/User';
+import { z } from "zod";
 
-const user = z.object({
-    username: z.string().min(3),
-    password: z.string().min(8)
-        .regex(/[A-Z]/, { message: "Password must include at least one capital letter" })
-        .regex(/[a-z]/, { message: "Password must include at least one small letter" })
-        .regex(/[1-9]/, { message: "Password must include at least one digit" })
-}).transform(u => new User(u.username, u.password));
+const login = z.object(
+    {
+        email: z.string().email(),
+        password: z.string().min(1)
+    }
+);
+export const loginSchema = z.object({
+    body: login
+});
 
+export type LoginType = z.infer<typeof login>;
+
+const user = z.object(
+    {
+        firstname: z.string().min(1),
+        lastname: z.string().min(1),
+        email: z.string().email(),
+        password: z.string().min(8)
+            .regex(/[@#$%^&+=]/, "must contain one of @#$%^&+=")
+            .regex(/[a-z]/, "must contain lower case letter")
+            .regex(/[A-Z]/, "must contain upper case letter")
+            .regex(/[0-9]/, "must contain number")
+    }
+);
 export const userSchema = z.object({
     body: user
 });

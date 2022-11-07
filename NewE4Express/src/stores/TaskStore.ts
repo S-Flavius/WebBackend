@@ -1,16 +1,13 @@
 import { Task } from "../classes/Task";
 
+class TaskStore extends Map<string, Task> {
+    add(task: Task) {
+        super.set(task.uuid, task);
+    }
 
-export let taskMap = new Map<String, Task>();
+    getValuesArray(): Array<Task> {
+        return [...this.values()];
+    }
+}
 
-
-
-// Beispieldaten
-let tempTask = new Task("Kehren");
-taskMap.set(tempTask.uuid, tempTask);
-tempTask = new Task("Putzen");
-taskMap.set(tempTask.uuid, tempTask);
-tempTask = new Task("Backen");
-taskMap.set(tempTask.uuid, tempTask);
-tempTask = new Task("Kochen", new Date(2022, 10, 17), false);
-taskMap.set(tempTask.uuid, tempTask);
+export let taskStore: TaskStore = new TaskStore();

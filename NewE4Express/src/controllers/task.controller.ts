@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import { Task } from "../classes/Task";
-import { taskMap } from "../stores/TaskStore";
+import { taskStore } from "../stores/TaskStore";
 
 
 export function deleteByUUID(req: Request, res: Response) {
-    let oldLen = taskMap.size;
-    taskMap.delete(req.params.uuid);
-    if (oldLen == taskMap.size)
+    let oldLen = taskStore.size;
+    taskStore.delete(req.params.uuid);
+    if (oldLen == taskStore.size)
         res.status(400).send("Could not delete");
 
     else
@@ -22,7 +22,7 @@ export function addTask(req: Request, res: Response) {
 export function addTasks(req: Request, res: Response) {
     var newTasks: Task[] = req.body;
 
-    newTasks.forEach(t => taskMap.set(t.uuid, t));
+    newTasks.forEach(t => taskStore.set(t.uuid, t));
 
     res.sendStatus(200);
 }
@@ -68,8 +68,8 @@ export function addTasks(req: Request, res: Response) {
 
 export function getItems(req: Request, res: Response) {
     if (req.query.showDone == "true")
-        res.json(taskMap.values());
+        res.json(taskStore.values());
 
     else
-        res.send(Array.from(taskMap.values()).filter(item => !item.isDone));
+        res.send(Array.from(taskStore.values()).filter(item => !item.isDone));
 }
