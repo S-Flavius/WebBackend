@@ -11,3 +11,15 @@ class TaskStore extends Map<string, Task> {
 }
 
 export let taskStore: TaskStore = new TaskStore();
+
+class UserTaskStore extends Map<string, TaskStore>{
+
+    get(key: string): TaskStore {
+        if (!this.has(key)) {
+            this.set(key, new TaskStore());
+        }
+        return super.get(key)!;
+    }
+}
+
+export let userTaskStore: UserTaskStore = new UserTaskStore();

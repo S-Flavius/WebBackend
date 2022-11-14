@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { LoginType, UserType } from "../schemes/userSchemes";
 import { userStore } from "../stores/UserStore";
 import jwt from 'jsonwebtoken';
+import { jwtSecret } from "../secrets/secrets";
 
 
 export async function signUp(req: Request<{}, {}, UserType>, res: Response) {
@@ -11,7 +12,7 @@ export async function signUp(req: Request<{}, {}, UserType>, res: Response) {
     } else {
         req.body.password = await bcrypt.hash(req.body.password, 10);
         userStore.push(req.body);
-        res.send(jwt.sign({ email: req.body.email }, 'I am a very really great and secret secret that nobody knows', { expiresIn: '30m' }));
+        res.send(200);
     }
 }
 
@@ -25,7 +26,7 @@ export async function login(req: Request, res: Response) {
     const loginForm: LoginType = req.body; // Alternative Typsicherheit
     const user = userStore.find(u => u.email == loginForm.email);
     if (user && await bcrypt.compare(loginForm.password, user.password)) {
-        res.status(200).send("OK");
+        res.status(200).send(jwt.sign({ email: req.body.email }, jwtSecret, { expiresIn: '30m' }));
     }
     else {
         res.status(401).send("Wrong credentials");

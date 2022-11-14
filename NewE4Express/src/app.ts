@@ -11,6 +11,7 @@ import { logout, signUp } from "./controllers/user.controller";
 import { login } from "./controllers/user.controller";
 import { userStore } from "./stores/UserStore";
 import jwt from 'jsonwebtoken';
+import { jwtSecret } from "./secrets/secrets";
 
 const app = express();
 
@@ -21,14 +22,21 @@ app.use((req, res, next) => {
         express.json()(req, res, next);
 });
 
-app.use("/api/user/login", (req, res) => {
-    // verify token
-    jwt.verify(req.headers.authorization!.split(" ")[1], 'I am a very really great and secret secret that nobody knows', (err: any, decoded: any) => {
+app.use("/api/user/login", (req, res, next) => {
+
+    if (req.originalUrl in ["/api/user", "/api/user/login"]) {
+        return next();
+    }
+
+    if (!req.headers.authorization) res.send(401);
+    jwt.verify(req.headers.authorization!.split(" ")[1], jwtSecret, (err, decoded: any) => {
         if (err) {
             res.sendStatus(401);
         } else {
-            if (userStore.find(e => e.email == decoded.email)) {
-                res.send(200);
+            let u = userStore.find(e => e.email == decoded.email);
+            if (u) {
+                res.locals.user = u;
+                next();
             } else {
                 res.sendStatus(401);
             }
@@ -47,7 +55,6 @@ const validateMiddlewareFactory = (schema: Schema) => ((req: Request, res: Respo
     next();
 });
 
-app.use(cookieParser("asdfyoiewqyroiuyadsf"));
 
 app.listen(3000, () => {
     console.log("Express is running on http://localhost:3000");

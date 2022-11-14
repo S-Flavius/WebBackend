@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import { Task } from "../classes/Task";
-import { taskStore } from "../stores/TaskStore";
+import { userTaskStore } from "../stores/TaskStore";
 
 
 export function deleteByUUID(req: Request, res: Response) {
-    let oldLen = taskStore.size;
-    taskStore.delete(req.params.uuid);
-    if (oldLen == taskStore.size)
+    let oldLen = userTaskStore.get(res.locals.user.email).size;
+    userTaskStore.get(res.locals.user.email).delete(req.params.uuid);
+    if (oldLen == userTaskStore.get(res.locals.user.email).size)
         res.status(400).send("Could not delete");
 
     else
@@ -22,7 +22,7 @@ export function addTask(req: Request, res: Response) {
 export function addTasks(req: Request, res: Response) {
     var newTasks: Task[] = req.body;
 
-    newTasks.forEach(t => taskStore.set(t.uuid, t));
+    newTasks.forEach(t => userTaskStore.get(res.locals.user.email).set(t.uuid, t));
 
     res.sendStatus(200);
 }
@@ -68,8 +68,7 @@ export function addTasks(req: Request, res: Response) {
 
 export function getItems(req: Request, res: Response) {
     if (req.query.showDone == "true")
-        res.json(taskStore.values());
-
+        res.json(userTaskStore.get(res.locals.user.email).values());
     else
-        res.send(Array.from(taskStore.values()).filter(item => !item.isDone));
+        res.send(Array.from(userTaskStore.get(res.locals.user.email).values()).filter(item => !item.isDone));
 }

@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { taskStore } from "../stores/TaskStore";
+import { taskSchema } from "./taskSchemes";
 
 const login = z.object(
     {
@@ -6,6 +8,7 @@ const login = z.object(
         password: z.string().min(1)
     }
 );
+
 export const loginSchema = z.object({
     body: login
 });
