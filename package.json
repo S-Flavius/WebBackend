@@ -1,5 +1,14 @@
 {
   "dependencies": {
+<<<<<<< HEAD
     "zod": "^3.19.1"
+=======
+    "@types/jsonwebtoken": "^8.5.9",
+    "cookie-parser": "^1.4.6",
+    "jsonwebtoken": "^8.5.1"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.3"
+>>>>>>> dfbdb71e1c0c76522b847a01de6a3ea1d1629adc
   }
 }

@@ -7,8 +7,6 @@ try {
 } catch (error: any) {
     console.log(error.issues);
 }
-
-
 schemaString.min(1);
 
 const objectSchema = z.object({
