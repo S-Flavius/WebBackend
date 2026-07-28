@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@types/express": "^4.17.14",
-    "express": "^4.21.2"
+    "express": "^4.22.1"
   },
   "name": "e4express",
   "version": "1.0.0",
